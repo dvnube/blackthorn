@@ -49,6 +49,6 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
      * @return A List<String> of channel names this implementation is subscribed to.
      */
     public List<String> getSubscribedChannels() {
-        return new List<String>{ INCOMING_LEAD_CHANNEL, TEST_CHANNEL };
+        return new List<String>{ INCOMING_LEAD_CHANNEL };
     }
 }
