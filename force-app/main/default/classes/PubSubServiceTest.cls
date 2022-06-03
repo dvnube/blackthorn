@@ -20,7 +20,8 @@ private class PubSubServiceTest {
 
         Lead testLead = new Lead(
                 FirstName = 'TestLead',
-                LastName = 'Tester');
+                LastName = 'Tester',
+                Company = 'Blackthorn');
 
         IHandleMessages testHandler = new IncomingContactHandler();
         IHandleMessages testHandler2 = new IncomingLeadWithObjectChannelHandler();
@@ -98,6 +99,7 @@ private class PubSubServiceTest {
 
             Lead leadToInsert = (Lead)data;
             leadToInsert.FirstName = EXPECTED_ASSISTANT_NAME;
+            leadToInsert.Company = 'Blackthorn';
 
             Database.insert(leadToInsert);
         }
