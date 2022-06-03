@@ -2,11 +2,10 @@
  * @description A simple Pub/Sub pattern implementation
  */
 public with sharing class PubSubService {
-    //Set<IHandleMessages> subscribers;
-    Map<String, IHandleMessages> subscribers;
+    Set<IHandleMessages> subscribers;
 
     private PubSubService() {
-        subscribers = new Map<String, IHandleMessages>();
+        subscribers = new Set<IHandleMessages>();
     }
 
     /**
@@ -31,8 +30,8 @@ public with sharing class PubSubService {
      */
     public void subscribe(IHandleMessages implementation) {
         ArgumentNullException.throwIfNull(implementation, 'implementation');
-        if (!subscribers.containsKey(implementation.getClassName())) {
-            subscribers.put(implementation.getClassName(), implementation);
+        if (!subscribers.contains(implementation)) {
+            subscribers.add(implementation);
         }
     }
 
@@ -43,8 +42,8 @@ public with sharing class PubSubService {
      */
     public void unsubscribe(IHandleMessages implementation) {
         ArgumentNullException.throwIfNull(implementation, 'implementation');
-        if (subscribers.containsKey(implementation.getClassName())) {
-            subscribers.remove(implementation.getClassName());
+        if (subscribers.contains(implementation)) {
+            subscribers.remove(implementation);
         }
     }
 
@@ -55,21 +54,10 @@ public with sharing class PubSubService {
      * @throws ArgumentNullException if channel is null.
      */
     public void emit(String channel, Object data) {
-        for (IHandleMessages subscriber : subscribers.values()) {
+        for (IHandleMessages subscriber : subscribers) {
             if (subscriber.getSubscribedChannels().contains(channel)) {
                 subscriber.handleMessage(channel, data);
             }
-        }
-    }
-
-
-
-
-    public void emit2(String channel, Object data) {
-        List<Subscription__mdt> subscriptions = SubscriptionsSelector.Instance.selectByChannelAndSubscribers(channel, subscribers.keySet());
-
-        for (Subscription__mdt subscription : subscriptions) {
-            ((IHandleMessages2) (Type.forName(subscription.Subscriber__r.DeveloperName).newInstance())).handleMessage(subscription, data);
         }
     }
 }

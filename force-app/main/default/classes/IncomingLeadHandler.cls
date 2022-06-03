@@ -69,13 +69,4 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
     public List<String> getSubscribedChannels() {
         return new List<String>{ INCOMING_LEAD_CHANNEL };
     }
-
-
-    public String getClassName() {
-        return IncomingLeadHandler.class.getName();
-    }
-
-    public void handleMessage(Subscription__mdt subscription, Object data) {
-        ((IChannelHandler) Type.forName(subscription.ChannelHandlerClassName__r.DeveloperName).newInstance()).handleMessage(data);
-    }
 }
