@@ -2,20 +2,16 @@
  * @description An implementation of IHandleMessages which validates the passed in Lead and inserts it.
  */
 public with sharing class IncomingLeadHandler implements IHandleMessages {
-    @testVisible
-    private static final String INCOMING_LEAD_CHANNEL = 'IncomingLeads';
-    @testVisible
-    private static final String INVALID_LEAD_ERROR = 'The Lead specified is invalid.';
-    @testVisible
-    private static final String CHANNEL_PARAM = 'channel';
+    @testVisible private static final String INCOMING_LEAD_CHANNEL = 'IncomingLeads';
+    @testVisible private static final String INVALID_LEAD_ERROR = 'The Lead specified is invalid.';
+    @testVisible private static final String CHANNEL_PARAM = 'channel';
     private static final String LEAD_FIRSTNAME_PARAM = 'Lead.FirstName';
     private static final String UNEXPECTED_ERROR = 'Unexpected error: {0} - Line: {1}';
 
     /**
      * @description Constructs an instance of IncomingLeadHandler.
      */
-    public IncomingLeadHandler() {
-    }
+    public IncomingLeadHandler() {}
 
     /**
      * @description Handles a message on a subscribed channel.
@@ -43,7 +39,7 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
         } catch (ArgumentNullException ane) {
             throw ane;
         } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, String.format(NULL_ARGUMENT_ERROR, new List<String>{ e.getMessage(), e.getLineNumber() }));
+            System.debug(LoggingLevel.ERROR, String.format(UNEXPECTED_ERROR, new List<String>{ e.getMessage(), ''+e.getLineNumber() }));
             throw e;
         }
     }
@@ -53,6 +49,6 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
      * @return A List<String> of channel names this implementation is subscribed to.
      */
     public List<String> getSubscribedChannels() {
-        return new List<String>{ INCOMING_LEAD_CHANNEL };
+        return new List<String>{ INCOMING_LEAD_CHANNEL, TEST_CHANNEL };
     }
 }
