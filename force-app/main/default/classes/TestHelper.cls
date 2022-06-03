@@ -34,13 +34,13 @@ public class TestHelper {
      * @param e The exception to check.
      * @throws An ArgumentNullException if e is null.
      */
-    /* public static void assertArgumentException(Exception e) {
+    public static void assertArgumentException(Exception e) {
         ArgumentNullException.throwIfNull(e, 'e');
 
         if (!(e instanceof ArgumentException)) {
             System.assert(false, String.format(NOT_ARGUMENT_EXCEPTION, new List<String> { e.getTypeName() }));
         }
-    } */
+    }
 
     /**
      * @description Assert that there was no exception thrown when an
@@ -54,9 +54,9 @@ public class TestHelper {
      * @description Assert that there was no exception thrown when an
      *              ArgumentException was expected.
      */
-    /* public static void expectedArgumentException() {
+    public static void expectedArgumentException() {
         expectedException(ArgumentException.class.getName());
-    } */
+    }
 
     /**
      * @description Assert that there was no exception thrown when one was expected.
