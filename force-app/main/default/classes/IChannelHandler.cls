@@ -1,3 +1,3 @@
 public interface IChannelHandler {
-    void handleMessage(Object data);    
+    void handleMessage(Object data);
 }

@@ -10,29 +10,11 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
     private static final String CHANNEL_PARAM = 'channel';
     private static final String LEAD_FIRSTNAME_PARAM = 'Lead.FirstName';
     private static final String UNEXPECTED_ERROR = 'Unexpected error: {0} - Line: {1}';
-    public Map<String, List<Subscription__mdt>> subscriptions { get; private set; }
 
     /**
      * @description Constructs an instance of IncomingLeadHandler.
      */
     public IncomingLeadHandler() {
-        loadSubscriptions(IncomingLeadHandler.class.getName());
-    }
-
-    public void loadSubscriptions(String className) {
-        subscriptions = new Map<String, List<Subscription__mdt>>();
-        List<Subscription__mdt> subs = [
-            SELECT Id, Channel__c, ChannelHandlerClassName__c
-            FROM Subscription__mdt
-            WHERE Subscriber__c = :className
-            ORDER BY ExecutionOrder__c
-        ];
-        for (Subscription__mdt sub : subs) {
-            if (!subscriptions.containsKey(sub.Channel__c)) {
-                subscriptions.put(sub.Channel__c, new List<Subscription__mdt>());
-            }
-            subscriptions.get(sub.Channel__c).add(sub);
-        }
     }
 
     /**
@@ -89,10 +71,11 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
     }
 
 
-    public void handleMessage2(String channel, Object data) {
-        List<Subscription__mdt> subsChannel = subscriptions.get(channel);
-        for (Subscription__mdt subChannel : subsChannel) {
-            ((IChannelHandler) Type.forName(subChannel.ChannelHandlerClassName__c).newInstance()).handleMessage(data);
-        }
+    public String getClassName() {
+        return IncomingLeadHandler.class.getName();
+    }
+
+    public void handleMessage(Subscription__mdt subscription, Object data) {
+        ((IChannelHandler) Type.forName(subscription.ChannelHandlerClassName__r.DeveloperName).newInstance()).handleMessage(data);
     }
 }

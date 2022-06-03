@@ -18,6 +18,7 @@ public interface IHandleMessages {
      * @return A List<String> of channel names this implementation is subscribed to.
      */
     List<String> getSubscribedChannels();
-
-    void loadSubscriptions(String className);
+    
+    void handleMessage(Subscription__mdt subscription, Object data);
+    String getClassName();
 }
