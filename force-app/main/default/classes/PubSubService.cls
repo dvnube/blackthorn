@@ -2,7 +2,11 @@
  * @description A simple Pub/Sub pattern implementation
  */
 public with sharing class PubSubService {
-    private PubSubService() { }
+    Set<IHandleMessages> subscribers;
+
+    private PubSubService() {
+        subscribers = new Set<IHandleMessages>();
+    }
 
     /**
      * @description A singleton for service interaction.
@@ -25,7 +29,10 @@ public with sharing class PubSubService {
      * @throws ArgumentNullException if implementation is null.
      */
     public void subscribe(IHandleMessages implementation) {
-        // TODO: Complete this method
+        ArgumentNullException.throwIfNull(implementation, 'implementation');
+        if (!subscribers.contains(implementation)) {
+            subscribers.add(implementation);
+        }
     }
 
     /**
@@ -34,7 +41,10 @@ public with sharing class PubSubService {
      * @throws ArgumentNullException if implementation is null.
      */
     public void unsubscribe(IHandleMessages implementation) {
-        // TODO: Complete this method
+        ArgumentNullException.throwIfNull(implementation, 'implementation');
+        if (subscribers.contains(implementation)) {
+            subscribers.remove(implementation);
+        }
     }
 
     /**
@@ -44,6 +54,10 @@ public with sharing class PubSubService {
      * @throws ArgumentNullException if channel is null.
      */
     public void emit(String channel, Object data) {
-        // TODO: Complete this method
+        for (IHandleMessages subscriber : subscribers) {
+            if (subscriber.getSubscribedChannels().contains(channel)) {
+                subscriber.handleMessage(channel, data);
+            }
+        }
     }
 }

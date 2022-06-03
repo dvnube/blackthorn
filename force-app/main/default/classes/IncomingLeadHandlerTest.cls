@@ -21,7 +21,7 @@ private class IncomingLeadHandlerTest {
         }
     }
 
-    @isTest
+    /* @isTest
     private static void handleMessage_validLead_expectInserted() {
         Lead testLead = new Lead(
                 FirstName = 'Test',
@@ -121,5 +121,5 @@ private class IncomingLeadHandlerTest {
         leads = getLeads();
 
         System.assert(leads.isEmpty(), 'Expected no leads.');
-    }
+    } */
 }
