@@ -2,28 +2,36 @@
  * @description An implementation of IHandleMessages which validates the passed in Lead and inserts it.
  */
 public with sharing class IncomingLeadHandler implements IHandleMessages {
-    @testVisible private static final String INCOMING_LEAD_CHANNEL = 'IncomingLeads';
-    @testVisible private static final String INVALID_LEAD_ERROR = 'The Lead specified is invalid.';
-    @testVisible private static final String CHANNEL_PARAM = 'channel';
+    @testVisible
+    private static final String INCOMING_LEAD_CHANNEL = 'IncomingLeads';
+    @testVisible
+    private static final String INVALID_LEAD_ERROR = 'The Lead specified is invalid.';
+    @testVisible
+    private static final String CHANNEL_PARAM = 'channel';
     private static final String LEAD_FIRSTNAME_PARAM = 'Lead.FirstName';
     private static final String UNEXPECTED_ERROR = 'Unexpected error: {0} - Line: {1}';
-    Map<String, List<Subscription__mdt>> mapChannelSubscriptions;
+    public Map<String, List<Subscription__mdt>> subscriptions { get; private set; }
 
     /**
      * @description Constructs an instance of IncomingLeadHandler.
      */
     public IncomingLeadHandler() {
-        loadSubscriptions(IncomingLeadHandler.class.getName());        
+        loadSubscriptions(IncomingLeadHandler.class.getName());
     }
 
     public void loadSubscriptions(String className) {
-        mapChannelSubscriptions = new Map<String, List<Subscription__mdt>>();
-        List<Subscription__mdt> subs = [SELECT Id, Channel__c, ChannelHandlerClassName__c FROM Subscription__mdt WHERE Subscriber__c = :className ORDER BY ExecutionOrder__c];
+        subscriptions = new Map<String, List<Subscription__mdt>>();
+        List<Subscription__mdt> subs = [
+            SELECT Id, Channel__c, ChannelHandlerClassName__c
+            FROM Subscription__mdt
+            WHERE Subscriber__c = :className
+            ORDER BY ExecutionOrder__c
+        ];
         for (Subscription__mdt sub : subs) {
-            if (!mapChannelSubscriptions.containsKey(sub.Channel__c)) {
-                mapChannelSubscriptions.put(sub.Channel__c, new List<Subscription__mdt>());
+            if (!subscriptions.containsKey(sub.Channel__c)) {
+                subscriptions.put(sub.Channel__c, new List<Subscription__mdt>());
             }
-            mapChannelSubscriptions.get(sub.Channel__c).add(sub);
+            subscriptions.get(sub.Channel__c).add(sub);
         }
     }
 
@@ -51,7 +59,7 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
         handleIncomingLeadChannel((Lead) data);
     }
 
-    void handleExceptions(Object data) {        
+    void handleExceptions(Object data) {
         try {
             Lead record = (Lead) data;
             handleFirstNameException(record.FirstName);
@@ -81,12 +89,10 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
     }
 
 
-
     public void handleMessage2(String channel, Object data) {
-        
-    }
-
-    public Map<String, List<Subscription__mdt>> getSubscribedChannels2() {
-        return subscriptions;
+        List<Subscription__mdt> subsChannel = subscriptions.get(channel);
+        for (Subscription__mdt subChannel : subsChannel) {
+            ((IChannelHandler) Type.forName(subChannel.ChannelHandlerClassName__c).newInstance()).handleMessage(data);
+        }
     }
 }
