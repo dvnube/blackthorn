@@ -39,3 +39,4 @@ $RECYCLE.BIN/
 # Local environment variables
 .env
 .vim-force.com/session.properties
+force-app/main/default/profiles/Admin.profile-meta.xml
