@@ -21,27 +21,41 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
      * @throws ArgumentException if the lead is missing a FirstName.
      */
     public void handleMessage(String channel, Object data) {
-        //channel is null
         ArgumentNullException.throwIfNull(channel, CHANNEL_PARAM);
+
+        handleChannels(channel, data);
+    }
+
+    void handleChannels(String channel, Object data) {
         if (channel.equals(INCOMING_LEAD_CHANNEL)) {
             handleIncomingLeadChannel(data);
         }
     }
 
     void handleIncomingLeadChannel(Object data) {
+        handleExceptions(data);
+        handleIncomingLeadChannel((Lead) data);
+    }
+
+    void handleExceptions(Object data) {        
         try {
             Lead record = (Lead) data;
-            ArgumentNullException.throwIfNull(record.FirstName, LEAD_FIRSTNAME_PARAM); //Lead is missing a FirstName
-
-            Database.insert(record);
+            handleFirstNameException(record.FirstName);
         } catch (TypeException te) {
             throw new ArgumentException(INVALID_LEAD_ERROR); //data is not a Lead
-        } catch (ArgumentNullException ane) {
-            throw ane;
-        } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, String.format(UNEXPECTED_ERROR, new List<String>{ e.getMessage(), ''+e.getLineNumber() }));
-            throw e;
         }
+    }
+
+    void handleFirstNameException(String value) {
+        try {
+            ArgumentNullException.throwIfNull(value, LEAD_FIRSTNAME_PARAM);
+        } catch (ArgumentNullException e) {
+            throw new ArgumentException(INVALID_LEAD_ERROR);
+        }
+    }
+
+    void handleIncomingLeadChannel(Lead record) {
+        Database.insert(record);
     }
 
     /**

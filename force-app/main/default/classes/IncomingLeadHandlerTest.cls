@@ -75,6 +75,23 @@ private class IncomingLeadHandlerTest {
     }
 
     @isTest
+    private static void handleMessage_invalidData_expectArgumentException() {
+        Contact c = new Contact();
+        IHandleMessages testHandler = new IncomingLeadHandler();
+        PubSubService.Instance.subscribe(testHandler);
+
+        try {
+            Test.startTest();
+
+            PubSubService.Instance.emit(IncomingLeadHandler.INCOMING_LEAD_CHANNEL, c);
+        } catch (Exception e) {
+            TestHelper.assertArgumentException(e);
+        } finally {
+            Test.stopTest();
+        }
+    }
+
+    @isTest
     private static void handleMessage_invalidChannel_withLead_expectNoLeadInserted() {
         Lead testLead = new Lead(
                 FirstName = 'Test',
