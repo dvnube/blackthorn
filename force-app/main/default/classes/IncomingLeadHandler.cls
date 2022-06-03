@@ -7,11 +7,25 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
     @testVisible private static final String CHANNEL_PARAM = 'channel';
     private static final String LEAD_FIRSTNAME_PARAM = 'Lead.FirstName';
     private static final String UNEXPECTED_ERROR = 'Unexpected error: {0} - Line: {1}';
+    Map<String, List<Subscription__mdt>> mapChannelSubscriptions;
 
     /**
      * @description Constructs an instance of IncomingLeadHandler.
      */
-    public IncomingLeadHandler() {}
+    public IncomingLeadHandler() {
+        loadSubscriptions(IncomingLeadHandler.class.getName());        
+    }
+
+    public void loadSubscriptions(String className) {
+        mapChannelSubscriptions = new Map<String, List<Subscription__mdt>>();
+        List<Subscription__mdt> subs = [SELECT Id, Channel__c, ChannelHandlerClassName__c FROM Subscription__mdt WHERE Subscriber__c = :className ORDER BY ExecutionOrder__c];
+        for (Subscription__mdt sub : subs) {
+            if (!mapChannelSubscriptions.containsKey(sub.Channel__c)) {
+                mapChannelSubscriptions.put(sub.Channel__c, new List<Subscription__mdt>());
+            }
+            mapChannelSubscriptions.get(sub.Channel__c).add(sub);
+        }
+    }
 
     /**
      * @description Handles a message on a subscribed channel.
@@ -64,5 +78,15 @@ public with sharing class IncomingLeadHandler implements IHandleMessages {
      */
     public List<String> getSubscribedChannels() {
         return new List<String>{ INCOMING_LEAD_CHANNEL };
+    }
+
+
+
+    public void handleMessage2(String channel, Object data) {
+        
+    }
+
+    public Map<String, List<Subscription__mdt>> getSubscribedChannels2() {
+        return subscriptions;
     }
 }
